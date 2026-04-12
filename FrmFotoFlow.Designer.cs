@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmFotoFlow));
             txtRuta = new TextBox();
             btnIniciar = new Button();
             btnDetener = new Button();
@@ -127,6 +128,7 @@
             Controls.Add(btnDetener);
             Controls.Add(btnIniciar);
             Controls.Add(txtRuta);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FrmFotoFlow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "FotoFlow";

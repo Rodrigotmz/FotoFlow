@@ -1,22 +1,23 @@
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using FotoFlow.Core;
 
 namespace FotoFlow
 {
     public partial class FrmFotoFlow : Form
     {
-        private CancellationTokenSource cts;
-        private HashSet<string> procesados = new HashSet<string>();
-        private string adbPath;
-        private bool errorMostrado = false;
+        private IFotoFlowService _service;
 
         public FrmFotoFlow()
         {
             InitializeComponent();
-            adbPath = Path.Combine(Application.StartupPath, "adb", "adb.exe");
-            lblStatusPhoto.Visible = true;
-            lblStatusPhoto.Text = "Listo.";
-            pgrbrStatusPhoto.Value = 0;
-            pgrbrStatusPhoto.Visible = false;
+            _service = new FotoFlowService();
+            _service.ProgressChanged += OnServiceProgress;
+            _service.StatusChanged += OnServiceStatus;
+            _service.ErrorOccurred += OnServiceError;
         }
 
         private void TrySelectFolder(bool promptUser)
@@ -51,6 +52,14 @@ namespace FotoFlow
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            lblStatusPhoto.Visible = true;
+            lblStatusPhoto.Text = "Listo.";
+            // Ensure progress bar is configured
+            pgrbrStatusPhoto.Minimum = 0;
+            pgrbrStatusPhoto.Maximum = 100;
+            pgrbrStatusPhoto.Style = ProgressBarStyle.Continuous;
+            pgrbrStatusPhoto.Value = 0;
+            pgrbrStatusPhoto.Visible = false;
             btnIniciar.Enabled = true;
             btnDetener.Enabled = false;
             TrySelectFolder(promptUser: false);
@@ -67,49 +76,48 @@ namespace FotoFlow
                 return;
             }
 
-            if (!File.Exists(adbPath))
-            {
-                MessageBox.Show("No se encontró ADB en la carpeta /adb");
-                lblStatusPhoto.Text = "Listo.";
-                return;
-            }
-            if (!Directory.Exists(destino))
-            {
-                Directory.CreateDirectory(destino);
-            }
-            cts = new CancellationTokenSource();
             btnIniciar.Enabled = false;
             btnDetener.Enabled = true;
-            lblStatusPhoto.Text = "Esperando archivos.";
-            await Task.Run(() => LoopFotos(destino, cts.Token));
+
+            try
+            {
+                await _service.StartAsync(destino, chbxValidateDelete.Checked);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+                lblStatusPhoto.Text = "Listo.";
+                btnIniciar.Enabled = true;
+                btnDetener.Enabled = false;
+            }
         }
 
         private void btnDetener_Click(object sender, EventArgs e)
         {
-            cts?.Cancel();
+            _service.Stop();
             btnIniciar.Enabled = true;
             btnDetener.Enabled = false;
+            UpdateUI(() =>
+            {
+                pgrbrStatusPhoto.Value = 0;
+                pgrbrStatusPhoto.Visible = false;
+            });
         }
         private void SetProgress(int value)
         {
+            // Ensure updates happen on the UI thread and control visibility follows progress.
             try
             {
-                pgrbrStatusPhoto.Invoke(new Action(() =>
+                UpdateUI(() =>
                 {
-                    pgrbrStatusPhoto.Value = Math.Min(value, pgrbrStatusPhoto.Maximum);
-                }));
+                    // Clamp value to valid range
+                    int v = Math.Max(pgrbrStatusPhoto.Minimum, Math.Min(value, pgrbrStatusPhoto.Maximum));
+                    pgrbrStatusPhoto.Value = v;
+                    // Show progress bar while work is in progress (non-zero). Hide when idle (0).
+                    pgrbrStatusPhoto.Visible = v != 0;
+                });
             }
             catch { }
-        }
-        private void SimularProgreso(CancellationToken token)
-        {
-            for (int i = 0; i <= 90; i += 10)
-            {
-                if (token.IsCancellationRequested) return;
-
-                SetProgress(i);
-                Thread.Sleep(100); // velocidad de animación
-            }
         }
         private void UpdateUI(Action action)
         {
@@ -122,118 +130,7 @@ namespace FotoFlow
             }
             catch { }
         }
-        private void LoopFotos(string destino, CancellationToken token)
-        {
-            try
-            {
-                var inicial = EjecutarADB("shell ls /sdcard/DCIM/Camera");
-                var listaInicial = inicial.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (var file in listaInicial)
-                    procesados.Add(file);
-            }
-            catch (Exception ex)
-            {
-                MostrarErrorUnaVez("Error inicial: " + ex.Message);
-                return;
-            }
-
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    var archivos = EjecutarADB("shell ls /sdcard/DCIM/Camera");
-
-                    var lista = archivos.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var file in lista)
-                    {
-                        if (procesados.Contains(file))
-                            continue;
-                        string rutaLocal = Path.Combine(destino, file);
-
-                        int progresoPorPaso = chbxValidateDelete.Checked ? 50 : 100;
-                        string mensaje = chbxValidateDelete.Checked ? $"Transferiendo {file} (50%)" : $"Transferiendo {file}";
-                        
-                        UpdateUI(() =>
-                        {
-                            SetProgress(0);
-                            lblStatusPhoto.Visible = true;
-                            lblStatusPhoto.Text = mensaje;
-                            pgrbrStatusPhoto.Visible = true;
-                        });
-                        
-                        var progresoTask = Task.Run(() => SimularProgreso(token));
-
-                        EjecutarADB($"pull /sdcard/DCIM/Camera/{file} \"{rutaLocal}\"");
-                        progresoTask.Wait();
-
-                        if (File.Exists(rutaLocal))
-                        {
-                            procesados.Add(file);
-                            UpdateUI(() =>
-                            {
-                            lblStatusPhoto.Text = $"Eliminando {file} del dispositivo(50 %)";
-                                SetProgress(progresoPorPaso);
-                            });
-                        }
-                        if (chbxValidateDelete.Checked == true)
-                        {
-                            EjecutarADB($"shell rm /sdcard/DCIM/Camera/{file}");
-                        }
-                        UpdateUI(() =>
-                        {
-                            lblStatusPhoto.Text = $"Archivo {file} transferido correctamente";
-                            SetProgress(100);
-                        });
-                        progresoTask.Wait();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MostrarErrorUnaVez(ex.Message);
-                }
-
-                Thread.Sleep(2000);
-                lblStatusPhoto.Invoke(new Action(() =>
-                {
-                    lblStatusPhoto.Visible = true;
-                    lblStatusPhoto.Text = "Esperando archivos.";
-                    pgrbrStatusPhoto.Visible = false;
-                    SetProgress(0);
-                }));
-            }
-        }
-        private string EjecutarADB(string argumentos)
-        {
-            var proceso = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = adbPath,
-                    Arguments = argumentos,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
-            proceso.Start();
-            string resultado = proceso.StandardOutput.ReadToEnd();
-            proceso.WaitForExit();
-            return resultado;
-        }
-
-        private void MostrarErrorUnaVez(string mensaje)
-        {
-            if (errorMostrado) return;
-
-            errorMostrado = true;
-
-            Invoke(new Action(() =>
-            {
-                MessageBox.Show(mensaje, "Error");
-            }));
-        }
-
+        // Logic moved to FotoFlowService in FotoFlow.Core
 
         private void folderBrowserDialog1_HelpRequest(object sender, EventArgs e)
         {
@@ -253,12 +150,31 @@ namespace FotoFlow
             { 
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-#else
+            #else
             if(chbxValidateDelete.Checked == true)
             {
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-#endif
+            #endif
+        }
+
+        private void OnServiceProgress(int value)
+        {
+            SetProgress(value);
+        }
+
+        private void OnServiceStatus(string status)
+        {
+            UpdateUI(() =>
+            {
+                lblStatusPhoto.Visible = true;
+                lblStatusPhoto.Text = status;
+            });
+        }
+
+        private void OnServiceError(string message)
+        {
+            UpdateUI(() => MessageBox.Show(message, "Error"));
         }
     }
 }
