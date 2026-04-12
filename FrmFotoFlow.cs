@@ -60,9 +60,26 @@ namespace FotoFlow
             pgrbrStatusPhoto.Style = ProgressBarStyle.Continuous;
             pgrbrStatusPhoto.Value = 0;
             pgrbrStatusPhoto.Visible = false;
-            btnIniciar.Enabled = true;
-            btnDetener.Enabled = false;
+            StyleButtonEnabled(btnIniciar, true, Color.YellowGreen, SystemColors.ControlLightLight);
+            StyleButtonEnabled(btnDetener, false, Color.Gainsboro, Color.Black);
             TrySelectFolder(promptUser: false);
+        }
+
+        private void StyleButtonEnabled(Button button, bool init, Color colorBackground, Color textColor)
+        {
+            button.FlatStyle = FlatStyle.Flat;
+                button.FlatAppearance.BorderSize = 0;
+            if (init)
+            {
+                button.BackColor = colorBackground;
+                button.ForeColor = textColor;
+                button.Enabled = init;
+                return;
+            }
+            button.Enabled = init;
+            button.BackColor = colorBackground;
+            button.ForeColor = textColor;
+
         }
 
         private async void btnIniciar_Click(object sender, EventArgs e)
@@ -75,9 +92,8 @@ namespace FotoFlow
                 lblStatusPhoto.Text = "Listo.";
                 return;
             }
-
-            btnIniciar.Enabled = false;
-            btnDetener.Enabled = true;
+            StyleButtonEnabled(btnIniciar, false, Color.Gainsboro, Color.Black);
+            StyleButtonEnabled(btnDetener, true, Color.Red, SystemColors.ControlLightLight);
 
             try
             {
@@ -95,8 +111,8 @@ namespace FotoFlow
         private void btnDetener_Click(object sender, EventArgs e)
         {
             _service.Stop();
-            btnIniciar.Enabled = true;
-            btnDetener.Enabled = false;
+            StyleButtonEnabled(btnIniciar, true, Color.YellowGreen, SystemColors.ControlLightLight);
+            StyleButtonEnabled(btnDetener, false, Color.Gainsboro, Color.Black);
             UpdateUI(() =>
             {
                 pgrbrStatusPhoto.Value = 0;
@@ -144,18 +160,18 @@ namespace FotoFlow
 
         private void chbxValidateDelete_CheckedChanged(object sender, EventArgs e)
         {
-            #if DEBUG
+#if DEBUG
             //MessageBox.Show($"Haz seleccionado {chbxValidateDelete.Checked}", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            if(chbxValidateDelete.Checked == true) 
-            { 
+            if (chbxValidateDelete.Checked == true)
+            {
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            #else
+#else
             if(chbxValidateDelete.Checked == true)
             {
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            #endif
+#endif
         }
 
         private void OnServiceProgress(int value)
@@ -175,6 +191,20 @@ namespace FotoFlow
         private void OnServiceError(string message)
         {
             UpdateUI(() => MessageBox.Show(message, "Error"));
+        }
+
+        private void btnAdvance_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Funcionalidad avanzada en desarrollo.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnDetener_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnDetener_MouseHover(object sender, EventArgs e)
+        {
         }
     }
 }

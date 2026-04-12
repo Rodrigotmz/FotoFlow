@@ -37,6 +37,7 @@
             fbdSelectPath = new FolderBrowserDialog();
             pgrbrStatusPhoto = new ProgressBar();
             lblStatusPhoto = new Label();
+            btnAdvance = new Button();
             SuspendLayout();
             // 
             // txtRuta
@@ -62,7 +63,7 @@
             // 
             // btnDetener
             // 
-            btnDetener.BackColor = Color.OrangeRed;
+            btnDetener.BackColor = Color.Red;
             btnDetener.FlatAppearance.BorderSize = 0;
             btnDetener.FlatStyle = FlatStyle.Flat;
             btnDetener.ForeColor = SystemColors.ControlLightLight;
@@ -116,11 +117,22 @@
             lblStatusPhoto.TabIndex = 6;
             lblStatusPhoto.Text = "Listo.";
             // 
+            // btnAdvance
+            // 
+            btnAdvance.Location = new Point(297, 180);
+            btnAdvance.Name = "btnAdvance";
+            btnAdvance.Size = new Size(71, 23);
+            btnAdvance.TabIndex = 7;
+            btnAdvance.Text = "Avanzado";
+            btnAdvance.UseVisualStyleBackColor = true;
+            btnAdvance.Click += btnAdvance_Click;
+            // 
             // FrmFotoFlow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(380, 209);
+            Controls.Add(btnAdvance);
             Controls.Add(lblStatusPhoto);
             Controls.Add(pgrbrStatusPhoto);
             Controls.Add(chbxValidateDelete);
@@ -147,5 +159,6 @@
         private FolderBrowserDialog fbdSelectPath;
         private ProgressBar pgrbrStatusPhoto;
         private Label lblStatusPhoto;
+        private Button btnAdvance;
     }
 }
