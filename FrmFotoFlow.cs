@@ -2,14 +2,14 @@ using System.Diagnostics;
 
 namespace FotoFlow
 {
-    public partial class Form1 : Form
+    public partial class FrmFotoFlow : Form
     {
         private CancellationTokenSource cts;
         private HashSet<string> procesados = new HashSet<string>();
         private string adbPath;
         private bool errorMostrado = false;
 
-        public Form1()
+        public FrmFotoFlow()
         {
             InitializeComponent();
             adbPath = Path.Combine(Application.StartupPath, "adb", "adb.exe");
@@ -88,9 +88,10 @@ namespace FotoFlow
                         if (File.Exists(rutaLocal))
                         {
                             procesados.Add(file);
-
-                            // Para borrar las fotos después de copiarlas:
-                            // EjecutarADB($"shell rm /sdcard/DCIM/Camera/{file}");
+                        }
+                        if (chbxValidateDelete.Checked == true)
+                        {
+                            EjecutarADB($"shell rm /sdcard/DCIM/Camera/{file}");
                         }
                     }
                 }
@@ -153,6 +154,13 @@ namespace FotoFlow
                     txtRuta.Text = selectedPath;
                 }
             }
+        }
+
+        private void chbxValidateDelete_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //Debugg
+            //MessageBox.Show($"Haz seleccionado {chbxValidateDelete.Checked}", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace FotoFlow
 {
-    partial class Form1
+    partial class FrmFotoFlow
     {
         /// <summary>
         ///  Required designer variable.
@@ -33,6 +33,7 @@
             btnDetener = new Button();
             fbdSelectPath = new FolderBrowserDialog();
             btnSelectPath = new Button();
+            chbxValidateDelete = new CheckBox();
             SuspendLayout();
             // 
             // txtRuta
@@ -48,7 +49,7 @@
             btnIniciar.FlatAppearance.BorderSize = 0;
             btnIniciar.FlatStyle = FlatStyle.Flat;
             btnIniciar.ForeColor = SystemColors.ControlLightLight;
-            btnIniciar.Location = new Point(12, 69);
+            btnIniciar.Location = new Point(9, 105);
             btnIniciar.Name = "btnIniciar";
             btnIniciar.Size = new Size(105, 23);
             btnIniciar.TabIndex = 1;
@@ -62,7 +63,7 @@
             btnDetener.FlatAppearance.BorderSize = 0;
             btnDetener.FlatStyle = FlatStyle.Flat;
             btnDetener.ForeColor = SystemColors.ControlLightLight;
-            btnDetener.Location = new Point(132, 69);
+            btnDetener.Location = new Point(129, 105);
             btnDetener.Name = "btnDetener";
             btnDetener.Size = new Size(103, 23);
             btnDetener.TabIndex = 2;
@@ -84,16 +85,29 @@
             btnSelectPath.UseVisualStyleBackColor = true;
             btnSelectPath.Click += btnSelectPath_Click;
             // 
-            // Form1
+            // chbxValidateDelete
+            // 
+            chbxValidateDelete.AutoSize = true;
+            chbxValidateDelete.Location = new Point(12, 58);
+            chbxValidateDelete.Name = "chbxValidateDelete";
+            chbxValidateDelete.Size = new Size(197, 19);
+            chbxValidateDelete.TabIndex = 4;
+            chbxValidateDelete.Text = "Borrar las fotos una vez tomadas";
+            chbxValidateDelete.UseVisualStyleBackColor = true;
+            chbxValidateDelete.CheckedChanged += this.chbxValidateDelete_CheckedChanged;
+            // 
+            // FrmFotoFlow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(373, 154);
+            ClientSize = new Size(381, 171);
+            Controls.Add(chbxValidateDelete);
             Controls.Add(btnSelectPath);
             Controls.Add(btnDetener);
             Controls.Add(btnIniciar);
             Controls.Add(txtRuta);
-            Name = "Form1";
+            Name = "FrmFotoFlow";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "FotoFlow";
             Load += Form1_Load;
             ResumeLayout(false);
@@ -107,5 +121,6 @@
         private Button btnDetener;
         private FolderBrowserDialog fbdSelectPath;
         private Button btnSelectPath;
+        private CheckBox chbxValidateDelete;
     }
 }
