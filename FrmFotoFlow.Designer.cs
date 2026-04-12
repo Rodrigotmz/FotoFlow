@@ -31,9 +31,11 @@
             txtRuta = new TextBox();
             btnIniciar = new Button();
             btnDetener = new Button();
-            fbdSelectPath = new FolderBrowserDialog();
             btnSelectPath = new Button();
             chbxValidateDelete = new CheckBox();
+            fbdSelectPath = new FolderBrowserDialog();
+            pgrbrStatusPhoto = new ProgressBar();
+            lblStatusPhoto = new Label();
             SuspendLayout();
             // 
             // txtRuta
@@ -71,10 +73,6 @@
             btnDetener.UseVisualStyleBackColor = false;
             btnDetener.Click += btnDetener_Click;
             // 
-            // fbdSelectPath
-            // 
-            fbdSelectPath.HelpRequest += folderBrowserDialog1_HelpRequest;
-            // 
             // btnSelectPath
             // 
             btnSelectPath.Location = new Point(321, 12);
@@ -94,13 +92,36 @@
             chbxValidateDelete.TabIndex = 4;
             chbxValidateDelete.Text = "Borrar las fotos una vez tomadas";
             chbxValidateDelete.UseVisualStyleBackColor = true;
-            chbxValidateDelete.CheckedChanged += this.chbxValidateDelete_CheckedChanged;
+            chbxValidateDelete.CheckedChanged += chbxValidateDelete_CheckedChanged;
+            // 
+            // fbdSelectPath
+            // 
+            fbdSelectPath.InitialDirectory = "C:/";
+            fbdSelectPath.RootFolder = Environment.SpecialFolder.MyPictures;
+            // 
+            // pgrbrStatusPhoto
+            // 
+            pgrbrStatusPhoto.Location = new Point(9, 144);
+            pgrbrStatusPhoto.Name = "pgrbrStatusPhoto";
+            pgrbrStatusPhoto.Size = new Size(350, 23);
+            pgrbrStatusPhoto.TabIndex = 5;
+            // 
+            // lblStatusPhoto
+            // 
+            lblStatusPhoto.AutoSize = true;
+            lblStatusPhoto.Location = new Point(9, 188);
+            lblStatusPhoto.Name = "lblStatusPhoto";
+            lblStatusPhoto.Size = new Size(35, 15);
+            lblStatusPhoto.TabIndex = 6;
+            lblStatusPhoto.Text = "Listo.";
             // 
             // FrmFotoFlow
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(381, 171);
+            ClientSize = new Size(380, 209);
+            Controls.Add(lblStatusPhoto);
+            Controls.Add(pgrbrStatusPhoto);
             Controls.Add(chbxValidateDelete);
             Controls.Add(btnSelectPath);
             Controls.Add(btnDetener);
@@ -119,8 +140,10 @@
         private TextBox txtRuta;
         private Button btnIniciar;
         private Button btnDetener;
-        private FolderBrowserDialog fbdSelectPath;
         private Button btnSelectPath;
         private CheckBox chbxValidateDelete;
+        private FolderBrowserDialog fbdSelectPath;
+        private ProgressBar pgrbrStatusPhoto;
+        private Label lblStatusPhoto;
     }
 }
