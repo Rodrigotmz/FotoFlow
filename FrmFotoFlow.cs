@@ -53,7 +53,6 @@ namespace FotoFlow
         {
             btnIniciar.Enabled = true;
             btnDetener.Enabled = false;
-
             TrySelectFolder(promptUser: false);
         }
 
@@ -250,9 +249,15 @@ namespace FotoFlow
         {
             #if DEBUG
             //MessageBox.Show($"Haz seleccionado {chbxValidateDelete.Checked}", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if(chbxValidateDelete.Checked == true) 
+            { 
+                MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 #else
-            MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if(chbxValidateDelete.Checked == true)
+            {
+                MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de ser copiadas. Asegúrate de que las fotos se hayan copiado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 #endif
         }
     }

@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37111.16 d17.14
+VisualStudioVersion = 17.14.37111.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FotoFlow", "FotoFlow.csproj", "{6B62112F-1943-47AC-A5EE-A4F30898250E}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FotoFlowInstaller", "..\FotoFlowInstaller\FotoFlowInstaller.vdproj", "{309910B2-70AE-D7B1-4394-C0668AC3CA0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,8 @@ Global
 		{6B62112F-1943-47AC-A5EE-A4F30898250E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B62112F-1943-47AC-A5EE-A4F30898250E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B62112F-1943-47AC-A5EE-A4F30898250E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{309910B2-70AE-D7B1-4394-C0668AC3CA0A}.Debug|Any CPU.ActiveCfg = Debug
+		{309910B2-70AE-D7B1-4394-C0668AC3CA0A}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
