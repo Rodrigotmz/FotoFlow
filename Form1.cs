@@ -89,7 +89,7 @@ namespace FotoFlow
                         {
                             procesados.Add(file);
 
-                            // opcional:
+                            // Para borrar las fotos después de copiarlas:
                             // EjecutarADB($"shell rm /sdcard/DCIM/Camera/{file}");
                         }
                     }
@@ -144,7 +144,7 @@ namespace FotoFlow
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
                 folderDialog.Description = "Select the destination folder";
-                folderDialog.UseDescriptionForTitle = true; // Modern style
+                folderDialog.UseDescriptionForTitle = true;
                 folderDialog.ShowNewFolderButton = true;
 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
