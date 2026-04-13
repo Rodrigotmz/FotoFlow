@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <ApplicationIcon>FotoFlow.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\FotoFlow.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="FotoFlow.ico" />
+    <Content Include="Resources\FotoFlow.ico" />
   </ItemGroup>
 
   <ItemGroup>
