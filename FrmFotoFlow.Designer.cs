@@ -42,7 +42,7 @@
             // 
             // txtRuta
             // 
-            txtRuta.Location = new Point(12, 12);
+            txtRuta.Location = new Point(9, 50);
             txtRuta.Name = "txtRuta";
             txtRuta.Size = new Size(303, 23);
             txtRuta.TabIndex = 0;
@@ -53,7 +53,7 @@
             btnIniciar.FlatAppearance.BorderSize = 0;
             btnIniciar.FlatStyle = FlatStyle.Flat;
             btnIniciar.ForeColor = SystemColors.ControlLightLight;
-            btnIniciar.Location = new Point(9, 105);
+            btnIniciar.Location = new Point(6, 143);
             btnIniciar.Name = "btnIniciar";
             btnIniciar.Size = new Size(105, 23);
             btnIniciar.TabIndex = 1;
@@ -67,7 +67,7 @@
             btnDetener.FlatAppearance.BorderSize = 0;
             btnDetener.FlatStyle = FlatStyle.Flat;
             btnDetener.ForeColor = SystemColors.ControlLightLight;
-            btnDetener.Location = new Point(129, 105);
+            btnDetener.Location = new Point(126, 143);
             btnDetener.Name = "btnDetener";
             btnDetener.Size = new Size(103, 23);
             btnDetener.TabIndex = 2;
@@ -77,7 +77,7 @@
             // 
             // btnSelectPath
             // 
-            btnSelectPath.Location = new Point(321, 12);
+            btnSelectPath.Location = new Point(318, 50);
             btnSelectPath.Name = "btnSelectPath";
             btnSelectPath.Size = new Size(38, 23);
             btnSelectPath.TabIndex = 3;
@@ -88,7 +88,7 @@
             // chbxValidateDelete
             // 
             chbxValidateDelete.AutoSize = true;
-            chbxValidateDelete.Location = new Point(12, 58);
+            chbxValidateDelete.Location = new Point(9, 96);
             chbxValidateDelete.Name = "chbxValidateDelete";
             chbxValidateDelete.Size = new Size(197, 19);
             chbxValidateDelete.TabIndex = 4;
@@ -103,7 +103,7 @@
             // 
             // pgrbrStatusPhoto
             // 
-            pgrbrStatusPhoto.Location = new Point(9, 144);
+            pgrbrStatusPhoto.Location = new Point(6, 182);
             pgrbrStatusPhoto.Name = "pgrbrStatusPhoto";
             pgrbrStatusPhoto.Size = new Size(350, 23);
             pgrbrStatusPhoto.TabIndex = 5;
@@ -111,7 +111,7 @@
             // lblStatusPhoto
             // 
             lblStatusPhoto.AutoSize = true;
-            lblStatusPhoto.Location = new Point(9, 188);
+            lblStatusPhoto.Location = new Point(9, 244);
             lblStatusPhoto.Name = "lblStatusPhoto";
             lblStatusPhoto.Size = new Size(35, 15);
             lblStatusPhoto.TabIndex = 6;
@@ -119,7 +119,7 @@
             // 
             // btnAdvance
             // 
-            btnAdvance.Location = new Point(297, 180);
+            btnAdvance.Location = new Point(285, 12);
             btnAdvance.Name = "btnAdvance";
             btnAdvance.Size = new Size(71, 23);
             btnAdvance.TabIndex = 7;
@@ -131,7 +131,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(380, 209);
+            ClientSize = new Size(372, 268);
             Controls.Add(btnAdvance);
             Controls.Add(lblStatusPhoto);
             Controls.Add(pgrbrStatusPhoto);
@@ -141,6 +141,8 @@
             Controls.Add(btnIniciar);
             Controls.Add(txtRuta);
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximumSize = new Size(388, 307);
+            MinimumSize = new Size(388, 307);
             Name = "FrmFotoFlow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "FotoFlow";
