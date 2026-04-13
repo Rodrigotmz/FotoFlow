@@ -20,80 +20,29 @@ namespace FotoFlow
             _service.ErrorOccurred += OnServiceError;
         }
 
-        private void TrySelectFolder(bool promptUser)
-        {
-            if (!promptUser && !string.IsNullOrWhiteSpace(txtRuta.Text))
-                return;
-
-            string defaultPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-
-            if (!promptUser)
-            {
-                if (string.IsNullOrWhiteSpace(txtRuta.Text))
-                    txtRuta.Text = defaultPath;
-                return;
-            }
-
-            using (var folderDialog = new FolderBrowserDialog())
-            {
-                folderDialog.Description = "Selecciona la carpeta de destino para las fotos";
-                folderDialog.UseDescriptionForTitle = true;
-                folderDialog.ShowNewFolderButton = true;
-                folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;
-                folderDialog.SelectedPath = string.IsNullOrWhiteSpace(txtRuta.Text) ? defaultPath : txtRuta.Text;
-
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    txtRuta.Text = folderDialog.SelectedPath;
-                    return;
-                }
-            }
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             lblStatusPhoto.Visible = true;
-            lblStatusPhoto.Text = "Listo.";
+            lblStatusPhoto.Text = "Listo. Selecciona una ruta y presiona Iniciar.";
             // Ensure progress bar is configured
-            pgrbrStatusPhoto.Minimum = 0;
-            pgrbrStatusPhoto.Maximum = 100;
-            pgrbrStatusPhoto.Style = ProgressBarStyle.Continuous;
-            pgrbrStatusPhoto.Value = 0;
-            pgrbrStatusPhoto.Visible = false;
-            StyleButtonEnabled(btnIniciar, true, Color.YellowGreen, SystemColors.ControlLightLight);
-            StyleButtonEnabled(btnDetener, false, Color.Gainsboro, Color.Black);
-            TrySelectFolder(promptUser: false);
-        }
-
-        private void StyleButtonEnabled(Button button, bool init, Color colorBackground, Color textColor)
-        {
-            button.FlatStyle = FlatStyle.Flat;
-                button.FlatAppearance.BorderSize = 0;
-            if (init)
-            {
-                button.BackColor = colorBackground;
-                button.ForeColor = textColor;
-                button.Enabled = init;
-                return;
-            }
-            button.Enabled = init;
-            button.BackColor = colorBackground;
-            button.ForeColor = textColor;
-
+            pgrbrStatusPhoto.InitConfigurationProgressBar();
+            btnIniciar.StyleButtonEnabled(true, Color.YellowGreen, SystemColors.ControlLightLight);
+            btnDetener.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
+            txtRuta.TrySelectFolder(promptUser: false);
         }
 
         private async void btnIniciar_Click(object sender, EventArgs e)
         {
             string destino = txtRuta.Text;
-            lblStatusPhoto.Text = "Iniciando servicio de transferencia.";
+            lblStatusPhoto.Text = "Iniciando transferencia autom谩tica...";
             if (string.IsNullOrEmpty(destino))
             {
                 MessageBox.Show("Por favor, ingresa una ruta de destino.");
-                lblStatusPhoto.Text = "Listo.";
+                lblStatusPhoto.Text = "Listo. Ingresa una ruta para guardar.";
                 return;
             }
-            StyleButtonEnabled(btnIniciar, false, Color.Gainsboro, Color.Black);
-            StyleButtonEnabled(btnDetener, true, Color.Red, SystemColors.ControlLightLight);
+            btnIniciar.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
+            btnDetener.StyleButtonEnabled(true, Color.Red, SystemColors.ControlLightLight);
 
             try
             {
@@ -102,23 +51,25 @@ namespace FotoFlow
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Error");
-                lblStatusPhoto.Text = "Listo.";
-                btnIniciar.Enabled = true;
-                btnDetener.Enabled = false;
+                lblStatusPhoto.Text = "Listo. Ocurri贸 un error al iniciar.";
+                btnIniciar.StyleButtonEnabled(true, Color.YellowGreen, SystemColors.ControlLightLight);
+                btnDetener.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
             }
         }
 
         private void btnDetener_Click(object sender, EventArgs e)
         {
             _service.Stop();
-            StyleButtonEnabled(btnIniciar, true, Color.YellowGreen, SystemColors.ControlLightLight);
-            StyleButtonEnabled(btnDetener, false, Color.Gainsboro, Color.Black);
+            btnIniciar.StyleButtonEnabled(true, Color.YellowGreen, SystemColors.ControlLightLight);
+            btnDetener.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
             UpdateUI(() =>
             {
                 pgrbrStatusPhoto.Value = 0;
                 pgrbrStatusPhoto.Visible = false;
             });
+            lblStatusPhoto.Text = "Transferencia detenida.";
         }
+
         private void SetProgress(int value)
         {
             // Ensure updates happen on the UI thread and control visibility follows progress.
@@ -135,6 +86,7 @@ namespace FotoFlow
             }
             catch { }
         }
+
         private void UpdateUI(Action action)
         {
             try
@@ -146,6 +98,7 @@ namespace FotoFlow
             }
             catch { }
         }
+
         // Logic moved to FotoFlowService in FotoFlow.Core
 
         private void folderBrowserDialog1_HelpRequest(object sender, EventArgs e)
@@ -155,21 +108,20 @@ namespace FotoFlow
 
         private void btnSelectPath_Click(object sender, EventArgs e)
         {
-            TrySelectFolder(promptUser: true);
+            txtRuta.TrySelectFolder(promptUser: true);
         }
 
         private void chbxValidateDelete_CheckedChanged(object sender, EventArgs e)
         {
 #if DEBUG
-            //MessageBox.Show($"Haz seleccionado {chbxValidateDelete.Checked}", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Information);
             if (chbxValidateDelete.Checked == true)
             {
-                MessageBox.Show("Si marcas esta opci髇, las fotos se eliminar醤 del dispositivo despu閟 de ser copiadas. Aseg鷕ate de que las fotos se hayan copiado correctamente antes de habilitar esta opci髇.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Si marcas esta opci贸n, las fotos se eliminar谩n del dispositivo despu茅s de ser copiadas en tu PC. Aseg煤rate de que las fotos se hayan copiado correctamente antes de habilitar esta opci贸n.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 #else
             if(chbxValidateDelete.Checked == true)
             {
-                MessageBox.Show("Si marcas esta opci髇, las fotos se eliminar醤 del dispositivo despu閟 de ser copiadas. Aseg鷕ate de que las fotos se hayan copiado correctamente antes de habilitar esta opci髇.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Si marcas esta opci贸n, las fotos se eliminar谩n del dispositivo despu茅s de ser copiadas en tu PC. Aseg煤rate de que las fotos se hayan copiado correctamente antes de habilitar esta opci贸n.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 #endif
         }
@@ -184,7 +136,7 @@ namespace FotoFlow
             UpdateUI(() =>
             {
                 lblStatusPhoto.Visible = true;
-                lblStatusPhoto.Text = status;
+                lblStatusPhoto.Text = MapBasicStatus(status);
             });
         }
 
@@ -193,18 +145,40 @@ namespace FotoFlow
             UpdateUI(() => MessageBox.Show(message, "Error"));
         }
 
+        private static string MapBasicStatus(string status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+                return "Listo.";
+
+            if (status.StartsWith("Esperando", StringComparison.OrdinalIgnoreCase))
+                return "Esperando nuevas fotos en el dispositivo...";
+
+            if (status.StartsWith("Transferiendo", StringComparison.OrdinalIgnoreCase))
+            {
+                string file = status.Substring("Transferiendo".Length).Trim();
+                return $"Copiando: {file}";
+            }
+
+            if (status.StartsWith("Archivo ", StringComparison.OrdinalIgnoreCase) && status.Contains("transferido", StringComparison.OrdinalIgnoreCase))
+                return status.Replace("Archivo", "Guardado", StringComparison.OrdinalIgnoreCase);
+
+            return status;
+        }
+
         private void btnAdvance_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Funcionalidad avanzada en desarrollo.", "Informaci髇", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var advanceForm = new FrmFotoFlowAdvance();
+            this.Hide();
+            if (advanceForm.ShowDialog() == DialogResult.OK)
+            {
+                this.Show();
+
+            }
         }
 
-        private void btnDetener_Enter(object sender, EventArgs e)
+        private void FrmFotoFlow_FormClosed(object sender, FormClosedEventArgs e)
         {
-
-        }
-
-        private void btnDetener_MouseHover(object sender, EventArgs e)
-        {
+            Application.Exit();
         }
     }
 }
