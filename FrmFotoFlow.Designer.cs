@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmFotoFlow));
-            txtRuta = new TextBox();
+            txtPath = new TextBox();
             btnIniciar = new Button();
             btnDetener = new Button();
             btnSelectPath = new Button();
@@ -40,12 +40,12 @@
             btnAdvance = new Button();
             SuspendLayout();
             // 
-            // txtRuta
+            // txtPath
             // 
-            txtRuta.Location = new Point(9, 50);
-            txtRuta.Name = "txtRuta";
-            txtRuta.Size = new Size(303, 23);
-            txtRuta.TabIndex = 0;
+            txtPath.Location = new Point(9, 50);
+            txtPath.Name = "txtPath";
+            txtPath.Size = new Size(303, 23);
+            txtPath.TabIndex = 0;
             // 
             // btnIniciar
             // 
@@ -139,7 +139,7 @@
             Controls.Add(btnSelectPath);
             Controls.Add(btnDetener);
             Controls.Add(btnIniciar);
-            Controls.Add(txtRuta);
+            Controls.Add(txtPath);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximumSize = new Size(388, 307);
             MinimumSize = new Size(388, 307);
@@ -153,7 +153,7 @@
 
         #endregion
 
-        private TextBox txtRuta;
+        private TextBox txtPath;
         private Button btnIniciar;
         private Button btnDetener;
         private Button btnSelectPath;
