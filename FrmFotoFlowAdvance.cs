@@ -35,6 +35,7 @@ namespace FotoFlow
         private string? _currentDeviceFileName;
         private string? _currentOriginalFileName;
         private string? _currentOriginalExtension;
+        private bool _loadedSettings;
 
         public FrmFotoFlowAdvance()
         {
@@ -44,6 +45,9 @@ namespace FotoFlow
             _service.ProgressChanged += OnServiceProgress;
             _service.StatusChanged += OnServiceStatus;
             _service.ErrorOccurred += OnServiceError;
+            this.AcceptButton = btnSaveFile;
+
+            Activated += (_, _) => AppRuntimeState.LastMode = FotoFlowMode.Advance;
         }
 
         #region Control Event Form Handlers
@@ -53,6 +57,8 @@ namespace FotoFlow
             btnStart.StyleButtonEnabled(true, backgroundStart, textStart);
             btnStop.StyleButtonEnabled(false, backgroundDisabled, textDisabled);
             txtPath.TrySelectFolder(promptUser: false);
+            LoadLastPathIfAny();
+            txtPath.Leave += (_, _) => PersistPathIfValid();
 
             pcbxPreview.SizeMode = PictureBoxSizeMode.Zoom;
             btnSaveFile.Enabled = false;
@@ -78,6 +84,7 @@ namespace FotoFlow
                 lblSatus.Text = "Listo. Ingresa una ruta para guardar.";
                 return;
             }
+            PersistPathIfValid();
 
             _incomingFolder = Path.Combine(Path.GetTempPath(), "FotoFlow", "Incoming");
             Directory.CreateDirectory(_incomingFolder);
@@ -171,7 +178,7 @@ namespace FotoFlow
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de guardarlas en tu PC. Asegúrate de que la foto se haya guardado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 #else
-            if(chbxValidateDelete.Checked == true)
+            if (chbxValidateDelete.Checked == true)
             {
                 MessageBox.Show("Si marcas esta opción, las fotos se eliminarán del dispositivo después de guardarlas en tu PC. Asegúrate de que la foto se haya guardado correctamente antes de habilitar esta opción.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -187,6 +194,7 @@ namespace FotoFlow
 
         private void FrmFotoFlowAdvance_FormClosed(object sender, FormClosedEventArgs e)
         {
+            PersistPathIfValid();
             try { _service.Stop(); } catch { }
             StopIncomingWatcher();
             Application.Exit();
@@ -199,6 +207,7 @@ namespace FotoFlow
                 MessageBox.Show("Por favor, ingresa una ruta de destino.", "Ruta inválida");
                 return;
             }
+            PersistPathIfValid();
 
             string? incomingPath = _currentIncomingPath;
             if (string.IsNullOrWhiteSpace(incomingPath) || !File.Exists(incomingPath))
@@ -297,6 +306,7 @@ namespace FotoFlow
         private void btnSelectPath_Click(object? sender, EventArgs e)
         {
             txtPath.TrySelectFolder(promptUser: true);
+            PersistPathIfValid();
         }
 
         private void StartIncomingWatcher(string incomingFolder)
@@ -342,6 +352,33 @@ namespace FotoFlow
                 while (_pendingIncomingFiles.TryDequeue(out _)) { }
                 ClearCurrentFile();
             }
+        }
+
+        private void LoadLastPathIfAny()
+        {
+            if (_loadedSettings)
+                return;
+
+            _loadedSettings = true;
+            var settings = AppUserSettings.Load();
+            if (string.IsNullOrWhiteSpace(settings.LastPathAdvance))
+                return;
+
+            if (!Directory.Exists(settings.LastPathAdvance))
+                return;
+
+            txtPath.Text = settings.LastPathAdvance;
+        }
+
+        private void PersistPathIfValid()
+        {
+            string path = txtPath.Text.Trim();
+            if (string.IsNullOrWhiteSpace(path))
+                return;
+            if (!Directory.Exists(path))
+                return;
+
+            AppUserSettings.Update(s => s.LastPathAdvance = path);
         }
 
         private void IncomingWatcherOnFile(object? sender, FileSystemEventArgs e)
@@ -688,5 +725,6 @@ namespace FotoFlow
         {
             return value.Replace("\"", "\\\"");
         }
+
     }
 }
