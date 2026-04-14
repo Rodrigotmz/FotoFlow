@@ -10,6 +10,7 @@ namespace FotoFlow
     public partial class FrmFotoFlow : Form
     {
         private IFotoFlowService _service;
+        private bool _loadedSettings;
 
         public FrmFotoFlow()
         {
@@ -18,6 +19,8 @@ namespace FotoFlow
             _service.ProgressChanged += OnServiceProgress;
             _service.StatusChanged += OnServiceStatus;
             _service.ErrorOccurred += OnServiceError;
+
+            Activated += (_, _) => AppRuntimeState.LastMode = FotoFlowMode.Basic;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -28,12 +31,15 @@ namespace FotoFlow
             pgrbrStatusPhoto.InitConfigurationProgressBar();
             btnIniciar.StyleButtonEnabled(true, Color.YellowGreen, SystemColors.ControlLightLight);
             btnDetener.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
-            txtRuta.TrySelectFolder(promptUser: false);
+            txtPath.TrySelectFolder(promptUser: false);
+
+            LoadLastPathIfAny();
+            txtPath.Leave += (_, _) => PersistPathIfValid();
         }
 
         private async void btnIniciar_Click(object sender, EventArgs e)
         {
-            string destino = txtRuta.Text;
+            string destino = txtPath.Text;
             lblStatusPhoto.Text = "Iniciando transferencia automática...";
             if (string.IsNullOrEmpty(destino))
             {
@@ -41,6 +47,7 @@ namespace FotoFlow
                 lblStatusPhoto.Text = "Listo. Ingresa una ruta para guardar.";
                 return;
             }
+            PersistPathIfValid();
             btnIniciar.StyleButtonEnabled(false, Color.Gainsboro, Color.Black);
             btnDetener.StyleButtonEnabled(true, Color.Red, SystemColors.ControlLightLight);
 
@@ -108,7 +115,8 @@ namespace FotoFlow
 
         private void btnSelectPath_Click(object sender, EventArgs e)
         {
-            txtRuta.TrySelectFolder(promptUser: true);
+            txtPath.TrySelectFolder(promptUser: true);
+            PersistPathIfValid();
         }
 
         private void chbxValidateDelete_CheckedChanged(object sender, EventArgs e)
@@ -178,7 +186,35 @@ namespace FotoFlow
 
         private void FrmFotoFlow_FormClosed(object sender, FormClosedEventArgs e)
         {
+            PersistPathIfValid();
             Application.Exit();
+        }
+
+        private void LoadLastPathIfAny()
+        {
+            if (_loadedSettings)
+                return;
+
+            _loadedSettings = true;
+            var settings = AppUserSettings.Load();
+            if (string.IsNullOrWhiteSpace(settings.LastPathBasic))
+                return;
+
+            if (!Directory.Exists(settings.LastPathBasic))
+                return;
+
+            txtPath.Text = settings.LastPathBasic;
+        }
+
+        private void PersistPathIfValid()
+        {
+            string path = txtPath.Text.Trim();
+            if (string.IsNullOrWhiteSpace(path))
+                return;
+            if (!Directory.Exists(path))
+                return;
+
+            AppUserSettings.Update(s => s.LastPathBasic = path);
         }
     }
 }
